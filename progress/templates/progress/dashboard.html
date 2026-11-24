@@ -1,0 +1,6 @@
+{% extends "accounts/layout.html" %}
+{% load static %}
+{% block title %}Theo dõi tiến độ | DOL IELTS{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/progress-dashboard.css' %}">{% endblock %}
+{% block crumbs %}<nav class="crumbs"><a href="{% url 'home' %}">Trang chủ</a><i>/</i><b>Tiến độ học tập</b></nav>{% endblock %}
+{% block account_content %}{% include 'progress/_dashboard_content.html' %}{% endblock %}

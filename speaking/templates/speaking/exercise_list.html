@@ -1,0 +1,5 @@
+{% extends 'productive/list_base.html' %}
+{% block title %}Luyện tập IELTS Speaking | DOL IELTS{% endblock %}
+{% block skill_link %}<a href="{% url 'speaking:exercise_list' %}">Speaking</a>{% endblock %}
+{% block library_hero %}{% include 'core/_module_hero.html' with label='Speaking' heading='Luyện tập IELTS Speaking' description='Thực hành Part 1, Part 2 và Part 3, ghi âm câu trả lời và nhận phân tích AI theo bốn tiêu chí IELTS.' icon='speaking' count=total_count %}{% endblock %}
+{% block library_filters %}{% url 'speaking:exercise_list' as filter_url %}{% include 'core/_practice_filter.html' with filter_search_placeholder='Tìm theo tiêu đề hoặc nội dung đề...' filter_show_topic=True filter_type_name='part' filter_type_label='Part' filter_type_choices=part_choices filter_type_value=selected_part filter_show_status=True filter_show_sort=True %}{% endblock %}

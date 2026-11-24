@@ -1,0 +1,34 @@
+{% extends "vocabulary/base.html" %}
+{% block title %}Từ vựng của tôi | DOL IELTS{% endblock %}
+{% block head %}<style>
+.my-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.my-stats{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 22px}
+.my-stats span{padding:12px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;color:#475569}
+.my-stats b{font-size:1.4rem;color:#cc1e2a}
+.my-filters{display:flex;gap:10px;flex-wrap:wrap;background:#fff;padding:16px;border:1px solid var(--line);border-radius:13px;margin-bottom:20px}
+.my-filters input{flex:2;min-width:180px}.my-filters select{flex:1;min-width:150px}
+.my-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.my-word{padding:18px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.my-word h3{margin:0 0 5px;font-size:1.4rem}.my-word p{margin:8px 0}.my-word small{color:var(--muted)}
+.my-word .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.my-word button{border-radius:8px;padding:8px 11px;border:1px solid #e5e7eb;background:#fff;color:#334155;cursor:pointer;font-family:inherit}
+.my-word .learn{border-color:#eac1c1;color:#c91a2b}.my-pages{display:flex;align-items:center;justify-content:center;gap:18px;margin:22px}
+</style>{% endblock %}
+{% block crumbs %}<nav class="crumbs"><a href="{% url 'home' %}">Trang chủ</a><i>/</i><a href="{% url 'vocabulary:topic_list' %}">Vocabulary</a><i>/</i><b>Từ vựng của tôi</b></nav>{% endblock %}
+{% block vocab_content %}
+<div class="my-toolbar"><div><h1>Từ vựng của tôi</h1><p class="sub">Những từ bạn đã lưu trong quá trình học. Bắt đầu ôn ngẫu nhiên bất cứ lúc nào.</p></div>
+<div class="row"><a class="btn plain" href="{% url 'vocabulary:topic_list' %}">+ Học thêm từ</a><a class="btn" href="{% url 'vocabulary:review_setup' %}">↻ Ôn từ vựng</a></div></div>
+<div class="my-stats"><span><b>{{ saved_count }}</b> từ đã lưu</span><span><b>{{ learned_count }}</b> từ đánh dấu đã học</span></div>
+<form method="get" class="my-filters"><input name="q" value="{{ q }}" placeholder="Gõ từ tiếng Anh hoặc nghĩa tiếng Việt…" aria-label="Tìm từ">
+<select name="topic" aria-label="Chọn chủ đề"><option value="">Tất cả chủ đề</option>{% for t in topics %}<option value="{{ t.pk }}" {% if topic_id == t.pk|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>{% endfor %}</select>
+<select name="status" aria-label="Trạng thái"><option value="">Tất cả trạng thái</option><option value="SAVED" {% if status_filter == 'SAVED' %}selected{% endif %}>Đã lưu</option><option value="LEARNED" {% if status_filter == 'LEARNED' %}selected{% endif %}>Đã học</option></select>
+<button class="btn" type="submit">Lọc từ</button><a class="btn plain" href="{% url 'vocabulary:my_words' %}">Đặt lại</a></form>
+{% if page_obj %}<div class="my-grid">{% for row in page_obj %}
+<article class="my-word"><h3>{{ row.word.word }}</h3><small>{{ row.word.phonetic }} · {{ row.word.topic.name }}</small>
+<p>{{ row.word.meaning_vi }}</p>{% if row.word.example_sentence %}<small><em>{{ row.word.example_sentence }}</em></small>{% endif %}
+<p><span class="chip">{% if row.status == 'LEARNED' %}✓ Đã học{% else %}Đã lưu{% endif %}</span></p>
+<div class="row">{% if row.status != 'LEARNED' %}<form method="post" action="{% url 'vocabulary:save_word' pk=row.word_id %}">{% csrf_token %}<input type="hidden" name="action" value="learned"><button class="learn">✓ Đánh dấu đã học</button></form>{% endif %}
+<form method="post" action="{% url 'vocabulary:save_word' pk=row.word_id %}" onsubmit="return confirm('Bỏ từ này khỏi kho cá nhân?')">{% csrf_token %}<input type="hidden" name="action" value="remove"><button>Bỏ lưu</button></form></div></article>
+{% endfor %}</div>{% else %}<div class="card"><h2>Chưa có từ phù hợp</h2><p>Lưu các từ từ trang chủ đề để xây dựng kho của riêng bạn.</p><a class="btn" href="{% url 'vocabulary:topic_list' %}">Chọn chủ đề học</a></div>{% endif %}
+{% if page_obj.has_other_pages %}<nav class="my-pages">{% if page_obj.has_previous %}<a href="?q={{ q|urlencode }}&topic={{ topic_id }}&status={{ status_filter }}&page={{ page_obj.previous_page_number }}">← Trước</a>{% endif %}<span>Trang {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?q={{ q|urlencode }}&topic={{ topic_id }}&status={{ status_filter }}&page={{ page_obj.next_page_number }}">Sau →</a>{% endif %}</nav>{% endif %}
+{% endblock %}

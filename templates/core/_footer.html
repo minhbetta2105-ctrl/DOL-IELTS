@@ -1,0 +1,44 @@
+{% load accounts_tags %}
+<footer class="footer site-global-footer" role="contentinfo">
+  <div class="footer-inner dol-footer-grid">
+    <div class="dol-footer-about">
+      <strong>DOL IELTS Đình Lực</strong>
+      <p>Luyện tập tiếng Anh, theo dõi kết quả và nâng cao kỹ năng IELTS trên cùng một nền tảng.</p>
+    </div>
+    <nav class="dol-footer-col" aria-label="Luyện thi IELTS">
+      <h2>Luyện thi IELTS</h2>
+      {% if user|is_hoc_vien %}
+      <a href="{% url 'listening:exercise_list' %}">Listening</a>
+      <a href="{% url 'reading:exercise_list' %}">Reading</a>
+      <a href="{% url 'writing:prompt_list' %}">Writing</a>
+      <a href="{% url 'speaking:exercise_list' %}">Speaking</a>
+      <a href="{% url 'vocabulary:topic_list' %}">Học từ vựng</a>
+      {% else %}
+      <a href="{% url 'accounts:login' %}?next={% url 'listening:exercise_list' %}">Listening</a>
+      <a href="{% url 'accounts:login' %}?next={% url 'reading:exercise_list' %}">Reading</a>
+      <a href="{% url 'accounts:login' %}?next={% url 'writing:prompt_list' %}">Writing</a>
+      <a href="{% url 'accounts:login' %}?next={% url 'speaking:exercise_list' %}">Speaking</a>
+      <a href="{% url 'accounts:login' %}?next={% url 'vocabulary:topic_list' %}">Học từ vựng</a>
+      {% endif %}
+    </nav>
+    <nav class="dol-footer-col" aria-label="Tài khoản và học tập">
+      <h2>Tài khoản &amp; học tập</h2>
+      {% if user.is_authenticated %}
+      <a href="{% url 'accounts:profile' %}">Tài khoản của tôi</a>
+      {% if user|is_hoc_vien %}<a href="{% url 'progress:dashboard' %}">Tiến độ học tập</a>{% endif %}
+      {% if user.is_active and user.is_staff %}{% if user.is_superuser or perms.writing.view_writingprompt or perms.speaking.view_speakingexercise or perms.receptive.view_exercise or perms.reading.view_readingexercise or perms.listening.view_listeningexercise or perms.vocabulary.view_topic or perms.auth.view_user or perms.feedback.view_servicefeedback %}<a href="{% url 'management:dashboard' %}">Quản lý</a>{% endif %}{% endif %}
+      {% else %}
+      <a href="{% url 'accounts:login' %}">Đăng nhập</a>
+      <a href="{% url 'accounts:register' %}">Đăng ký</a>
+      {% endif %}
+    </nav>
+    <nav class="dol-footer-col" aria-label="Thông tin và góp ý">
+      <h2>Liên kết hữu ích</h2>
+      <a href="{% url 'home' %}">Trang chủ</a>
+      {% if user|is_hoc_vien %}<a href="{% url 'feedback:feedback_submit' %}">Đánh giá &amp; góp ý</a>
+      {% elif user.is_authenticated %}<a href="{% url 'accounts:waiting' %}">Đánh giá &amp; góp ý</a>
+      {% else %}<a href="{% url 'accounts:login' %}">Đánh giá &amp; góp ý</a>{% endif %}
+    </nav>
+  </div>
+  <div class="dol-footer-bottom"><span>© DOL IELTS Đình Lực</span><span>Học tập chủ động, tiến bộ mỗi ngày.</span></div>
+</footer>

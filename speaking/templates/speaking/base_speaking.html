@@ -1,0 +1,5 @@
+{% extends 'core/skill_base.html' %}
+{% load static %}
+{% block title %}IELTS Speaking Practice | DOL IELTS Đình Lực{% endblock %}
+{% block module_styles %}<link rel="stylesheet" href="{% static 'css/speaking-legacy.css' %}">{% endblock %}
+{% block skill_link %}<a href="{% url 'speaking:exercise_list' %}">Speaking</a>{% endblock %}

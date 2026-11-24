@@ -1,0 +1,22 @@
+{% extends 'core/skill_base.html' %}
+{% load static %}
+{% block module_content %}
+<div class="pd-library">
+  {% block library_hero %}{% endblock %}
+  {% if db_error %}<div class="alert-error" role="alert">{{ db_error }}</div>{% endif %}
+  <section class="pd-library-section">
+    <div class="pd-section-head"><div><p class="pd-kicker">KHO LUYỆN TẬP</p><h2>Chọn bài luyện</h2></div><span class="pd-count">{{ total_count }} bài phù hợp</span></div>
+    {% block library_filters %}{% endblock %}
+    {% block library_cards %}<div class="pd-card-grid">
+      {% for card in cards %}
+      <a class="pd-card" href="{{ card.url }}">
+        <div class="pd-thumb"><img src="{% if card.image %}{{ card.image }}{% else %}{% static card.art %}{% endif %}" alt="" loading="lazy" data-fallback="{% static card.art %}"></div>
+        <div class="pd-card-copy"><div class="pd-card-meta">{{ card.kind }} <span>·</span> {{ card.level }}{% if card.topic %} · {{ card.topic }}{% endif %}</div><h3>{{ card.title }}</h3><p>{{ card.snippet|truncatechars:145 }}</p><div class="pd-card-foot"><span{% if card.done %} class="pd-done"{% endif %}>{% if card.done %}Đã làm{% else %}{{ card.hint }}{% endif %}</span><span class="pd-card-action">{% if card.done %}Luyện lại{% else %}Luyện tập{% endif %} <span aria-hidden="true">→</span></span></div></div>
+      </a>
+      {% empty %}{% if not db_error %}<div class="pd-empty"><h3>Không tìm thấy bài luyện</h3><p>Thử đổi bộ lọc hoặc từ khóa tìm kiếm.</p><a href="{{ request.path }}" class="btn btn-outline">Xem tất cả</a></div>{% endif %}{% endfor %}
+    </div>{% endblock %}
+    {% block library_footer %}{% endblock %}
+  </section>
+</div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/productive.js' %}" defer></script>{% endblock %}

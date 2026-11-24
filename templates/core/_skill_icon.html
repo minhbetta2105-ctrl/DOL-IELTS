@@ -1,0 +1,14 @@
+<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+{% if icon == 'reading' %}<path d="M24 12c-5-5-12-6-19-4v27c7-2 14-1 19 4 5-5 12-6 19-4V8c-7-2-14-1-19 4zM24 12v27M11 16c3 0 6 1 8 2M11 23c3 0 6 1 8 2M29 18c2-1 5-2 8-2M29 25c2-1 5-2 8-2"/>
+{% elif icon == 'listening' %}<path d="M8 26v-5a16 16 0 0 1 32 0v5M8 24h5v15H8a4 4 0 0 1-4-4v-7a4 4 0 0 1 4-4zM40 24h-5v15h5a4 4 0 0 0 4-4v-7a4 4 0 0 0-4-4zM35 39c0 4-4 5-9 5"/>
+{% elif icon == 'writing' %}<path d="M23 7H9v34h30V24M19 30l3-10L37 5l7 7-15 15-10 3zM33 9l7 7M15 36h16"/>
+{% elif icon == 'speaking' %}<rect x="18" y="4" width="12" height="25" rx="6"/><path d="M11 22v3a13 13 0 0 0 26 0v-3M24 38v7M16 45h16"/>
+{% elif icon == 'vocabulary' %}<rect x="7" y="7" width="27" height="34" rx="4"/><path d="M14 7v34M35 14h7v29H20M19 28l5-12 5 12M21 24h6"/>
+{% elif icon == 'progress' %}<path d="M6 8v32h37M12 32l9-10 7 4 12-16M34 10h6v6"/>
+{% elif icon == 'feedback' %}<path d="M7 9h34v26H21l-10 7v-7H7zM15 18h18M15 25h12"/>
+{% elif icon == 'users' %}<circle cx="18" cy="15" r="6"/><path d="M5 38v-4a13 13 0 0 1 26 0v4M30 9a6 6 0 0 1 0 12M35 26a10 10 0 0 1 8 10v2"/>
+{% elif icon == 'activity' %}<path d="M5 25h10l6-14 7 26 6-12h9"/><rect x="4" y="5" width="40" height="38" rx="7"/>
+{% elif icon == 'bell' %}<path d="M9 34h30l-4-7V17a11 11 0 0 0-22 0v10zM19 39a5 5 0 0 0 10 0M24 4v2"/>
+{% elif icon == 'clock' %}<circle cx="24" cy="24" r="18"/><path d="M24 13v12l8 5"/>
+{% elif icon == 'dashboard' %}<rect x="6" y="7" width="15" height="15" rx="3"/><rect x="27" y="7" width="15" height="15" rx="3"/><rect x="6" y="28" width="15" height="13" rx="3"/><rect x="27" y="28" width="15" height="13" rx="3"/>
+{% else %}<path d="M7 10h34v29H7zM7 17h34M15 24h18M15 31h12"/>{% endif %}</svg>

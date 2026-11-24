@@ -1,0 +1,12 @@
+{% extends 'productive/result_base.html' %}
+{% block title %}Kết quả Speaking | {{ snapshot.title }}{% endblock %}
+{% block skill_link %}<a href="{% url 'speaking:exercise_list' %}">Speaking</a>{% endblock %}
+{% block breadcrumbs %}<span>/</span><span>Kết quả bài luyện</span>{% endblock %}
+{% block report_label %}Speaking{% endblock %}
+{% block report_type %}<span>Part {{ snapshot.part|cut:'PART_'|default:'—' }}{% if snapshot.topic %} · {{ snapshot.topic }}{% endif %}</span>{% endblock %}
+{% block report_actions %}<a class="btn btn-outline" href="{% url 'speaking:exercise_detail' submission.exercise_id %}">Luyện lại</a><a class="btn btn-primary" href="{% url 'speaking:exercise_list' %}">Kho đề khác →</a>{% endblock %}
+{% block score_note %}<p class="pd-muted">Đánh giá dựa trên bài ghi âm đã nộp</p>{% endblock %}
+{% block answer_heading %}<h2>Bản ghi âm & transcript</h2>{% endblock %}
+{% block answer_media %}{% if submission.audio_file %}<audio class="pd-audio" controls preload="metadata" src="{{ submission.audio_file.url }}" aria-label="Nghe bài nói đã nộp"></audio>{% endif %}{% endblock %}
+{% block answer_text %}{{ report.transcript|default:'Chưa có transcript cho bài nộp này.' }}{% endblock %}
+{% block rubric_link %}<a href="https://ielts.org/cdn/ielts-guides/ielts-speaking-band-descriptors.pdf" target="_blank" rel="noopener noreferrer">IELTS Speaking Band Descriptors (Public Version)</a>{% endblock %}

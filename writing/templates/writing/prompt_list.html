@@ -1,0 +1,5 @@
+{% extends 'productive/list_base.html' %}
+{% block title %}Luyện tập IELTS Writing | DOL IELTS{% endblock %}
+{% block skill_link %}<a href="{% url 'writing:prompt_list' %}">Writing</a>{% endblock %}
+{% block library_hero %}{% include 'core/_module_hero.html' with label='Writing' heading='Luyện tập IELTS Writing' description='Thực hành Task 1 và Task 2, phát triển lập luận và nhận phân tích AI theo bốn tiêu chí IELTS.' icon='writing' count=total_count %}{% endblock %}
+{% block library_filters %}{% url 'writing:prompt_list' as filter_url %}{% include 'core/_practice_filter.html' with filter_search_placeholder='Tìm theo tiêu đề hoặc nội dung đề...' filter_show_topic=False filter_type_name='task_type' filter_type_label='Task' filter_type_choices=task_type_choices filter_type_value=selected_task_type filter_show_status=True filter_show_sort=True %}{% endblock %}

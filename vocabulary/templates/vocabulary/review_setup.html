@@ -1,0 +1,20 @@
+{% extends "vocabulary/base.html" %}
+{% block title %}Ôn từ vựng | DOL IELTS{% endblock %}
+{% block head %}<style>
+.review-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.review-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,.9fr);gap:20px}.review-panel{padding:24px;background:#fff;border:1px solid var(--line);border-radius:16px}.review-panel [hidden]{display:none!important}.review-panel label{display:block;font-weight:600;margin:18px 0 8px}.review-panel select{width:100%}.review-stat{font-size:3rem;color:var(--red);font-weight:800}.review-panel p{color:var(--muted)}
+@media(max-width:760px){.review-layout{grid-template-columns:1fr}}
+</style>{% endblock %}
+{% block crumbs %}<nav class="crumbs"><a href="{% url 'vocabulary:topic_list' %}">Vocabulary</a><i>/</i><a href="{% url 'vocabulary:my_words' %}">Từ vựng của tôi</a><i>/</i><b>Ôn từ vựng</b></nav>{% endblock %}
+{% block vocab_content %}<div class="review-head"><div><h1>Ôn từ vựng</h1><p class="sub">Chọn số từ và hình thức ôn từ kho cá nhân.</p></div><a class="btn plain" href="{% url 'vocabulary:my_words' %}">Kho từ của tôi →</a></div>
+<div class="review-layout"><form class="review-panel" method="post">{% csrf_token %}
+<h2>Thiết lập phiên ôn</h2><label for="review-count">Số từ muốn ôn</label>
+<select id="review-count" name="count" required>
+<option value="5" {% if word_count < 5 %}disabled{% endif %}>5 từ</option><option value="10" {% if word_count < 10 %}disabled{% endif %}>10 từ</option><option value="20" {% if word_count < 20 %}disabled{% endif %}>20 từ</option><option value="30" {% if word_count < 30 %}disabled{% endif %}>30 từ</option><option value="all" {% if not word_count %}disabled{% endif %}>Toàn bộ từ đã lưu</option><option value="custom">Tự chọn số từ…</option></select>
+<label for="custom-count" id="custom-label" hidden>Số từ tùy chọn</label><input id="custom-count" type="number" min="1" max="{{ word_count }}" name="custom_count" placeholder="Nhập số từ" hidden>
+<label for="review-type">Cách ôn</label><select id="review-type" name="exercise_type"><option value="TYPE">Gõ từ theo nghĩa</option><option value="MCQ">Trắc nghiệm chọn nghĩa (cần từ đủ điều kiện)</option><option value="DRAG">Kéo &amp; Thả điền câu (cần câu điền khuyết)</option></select>
+<div class="dol-review-capacity">Số từ đủ điều kiện: Gõ từ {{ review_capacity.TYPE }} · Trắc nghiệm {{ review_capacity.MCQ }} · Điền câu {{ review_capacity.DRAG }}. Trắc nghiệm cần ít nhất 4 từ khác nhau trong kho, điền câu cần chọn ít nhất 3 câu hợp lệ.</div>{{ form.non_field_errors }}
+<button type="submit" class="btn" {% if not word_count %}disabled{% endif %}>Bắt đầu ôn tập →</button></form>
+<aside class="review-panel"><h2>Kho từ hiện tại</h2><div class="review-stat">{{ word_count }}</div><p>từ có thể ôn từ những chủ đề đang hiển thị</p><div class="review-stat" style="font-size:2rem">{{ learned_count }}</div><p>từ đã đánh dấu học xong (không đồng nghĩa đã thuộc)</p>
+{% if not word_count %}<a class="btn plain" href="{% url 'vocabulary:topic_list' %}">Học và lưu từ trước</a>{% endif %}</aside></div>
+<script>document.getElementById('review-count').addEventListener('change',function(){var show=this.value==='custom';document.getElementById('custom-count').hidden=!show;document.getElementById('custom-label').hidden=!show;});</script>
+{% endblock %}

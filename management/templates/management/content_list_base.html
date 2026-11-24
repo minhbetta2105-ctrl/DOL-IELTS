@@ -1,0 +1,10 @@
+{% extends 'management/base_admin.html' %}
+{% load static %}
+{% block title %}Quản lý nội dung | DOL IELTS{% endblock %}
+{% block teacher_heading %}Quản lý nội dung <span class="ml-skill">{% block managed_skill %}{% endblock %}</span>{% endblock %}
+{% block management_content %}
+<div class="ml-library">
+<section class="ml-intro"><div><p class="teacher-eyebrow">KHO NỘI DUNG</p><p class="ml-description">{% block managed_description %}Quản lý bài luyện và trạng thái hiển thị cho học viên.{% endblock %}</p></div><div class="ml-actions">{% block managed_actions %}{% endblock %}</div></section>
+<section class="ml-card"><form method="get" class="ml-filter" aria-label="Bộ lọc nội dung"><label class="ml-search">Tìm kiếm<input name="q" type="search" value="{% block managed_query %}{% endblock %}" placeholder="Nhập từ khóa..."></label>{% block managed_filters %}{% endblock %}<div class="ml-actions"><button class="ml-btn primary" type="submit">Lọc</button><a class="ml-btn" href="{{ request.path }}">Đặt lại</a></div></form></section>
+<section class="ml-card ml-table-card"><header class="ml-table-head"><h2>Danh sách nội dung</h2><span>{% block managed_count %}{% endblock %}</span></header><div class="ml-scroll" role="region" aria-label="Danh sách nội dung" tabindex="0"><table class="ml-table"><thead><tr><th scope="col">ID</th><th scope="col">Tiêu đề</th><th scope="col">Phân loại</th><th scope="col">Trình độ</th><th scope="col">Trạng thái</th><th scope="col">Thao tác</th></tr></thead><tbody>{% block managed_rows %}{% endblock %}</tbody></table></div>{% block managed_footer %}{% endblock %}</section>
+</div>{% endblock %}

@@ -1,0 +1,99 @@
+{% load static l10n %}
+<div class="pr-dashboard" id="progress-overview">
+  {% if read_only_admin %}
+    <div class="pr-admin-strip"><a href="{% url 'management:student_progress_list' %}">← Danh sách học viên</a><span>Chế độ quản trị — Chỉ xem</span></div>
+  {% endif %}
+
+  <section class="pr-hero" data-dol-reveal aria-label="Tổng quan hành trình học">
+    <div class="pr-hero-copy">
+      <span class="pr-eyebrow">{% if read_only_admin %}BẢNG TIẾN ĐỘ HỌC VIÊN{% else %}TIẾN ĐỘ HỌC TẬP CỦA TÔI{% endif %}</span>
+      <h1>{% if read_only_admin %}Hành trình học của {{ student.get_full_name|default:student.username }}{% else %}Hành trình IELTS của bạn{% endif %}</h1>
+      <p>{% if read_only_admin %}Thống kê từ các bài luyện thực tế đã lưu. Không cho phép sửa điểm hoặc làm bài thay học viên.{% else %}{{ nudge.hero }}{% endif %}</p>
+      <div class="pr-hero-meta"><span><span class="pr-meta-dot"></span>{% if streak.last_date %}Lần luyện gần nhất: <b>{{ streak.last_date|date:'d/m/Y' }}</b>{% else %}Chưa có lượt luyện được ghi nhận{% endif %}</span></div>
+      {% if not read_only_admin %}<a class="pr-btn-main" href="{% url 'vocabulary:topic_list' %}">Tiếp tục học tập <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+    <div class="pr-hero-visual" aria-label="Chuỗi học liên tiếp">
+      <div class="pr-hero-glow" aria-hidden="true"></div>
+      <div class="pr-fire-emblem" aria-hidden="true">
+        <svg viewBox="0 0 80 96" width="72" height="82" fill="none"><path d="M42 5C46 21 63 27 63 48C63 59 59 72 47 79C50 62 43 57 34 46C32 60 21 65 24 79C12 73 7 59 11 43C15 30 26 25 29 14C36 19 39 27 39 36C45 27 47 17 42 5Z" fill="#FF8257"/><path d="M38 50C43 58 52 62 51 75C50 86 43 91 35 89C24 88 22 76 29 67C33 61 36 58 38 50Z" fill="#FFF0B2"/></svg>
+      </div>
+      <strong class="pr-hero-streak">{{ streak.current }} <span>ngày</span></strong>
+      <span class="pr-hero-streak-label">Chuỗi học hiện tại</span>
+      <div class="pr-hero-streak-bottom"><span>Kỷ lục: <b>{{ streak.longest }} ngày</b></span><span>{% if streak.studied_today %}✓ Hôm nay đã học{% elif streak.inactivity == 1 %}Còn duy trì{% else %}Sẵn sàng bắt đầu{% endif %}</span></div>
+    </div>
+  </section>
+
+  <section class="pr-section pr-overall" aria-label="Overall IELTS Band">
+    <div class="pr-block-heading"><div><span class="pr-eyebrow">IELTS BAND</span><h2>Overall hiện tại: {{ band_summary.overall|default_if_none:'Chưa đủ dữ liệu' }}</h2></div><p>{{ band_summary.count }}/4 kỹ năng có điểm phù hợp.</p></div>
+    <div class="pr-overall-grid">{% for b in band_summary.bands %}<article class="pr-band-card pr-band-{{ b.skill|lower }}"><div class="pr-band-top"><span class="pr-band-icon">{% include 'core/_skill_icon.html' with icon=b.skill|lower only %}</span><span>{{ b.label }}</span></div><strong>{{ b.band|default_if_none:'—' }}{% if b.band is not None %}<small> / 9</small>{% endif %}</strong><small>{% if b.date %}{{ b.date|date:'d/m/Y' }}{% if b.raw is not None %} · {{ b.raw }}/40 đúng{% endif %}{% else %}Chưa có bài phù hợp{% endif %}</small>{% if not read_only_admin %}<a href="{% if b.skill == 'READING' %}{% url 'reading:exercise_list' %}{% elif b.skill == 'LISTENING' %}{% url 'listening:exercise_list' %}{% elif b.skill == 'WRITING' %}{% url 'writing:prompt_list' %}{% else %}{% url 'speaking:exercise_list' %}{% endif %}">{% if b.skill == 'READING' or b.skill == 'LISTENING' %}Kho đề thi thử{% else %}Luyện tập{% endif %} →</a>{% endif %}</article>{% endfor %}</div>
+    <p>Reading/Listening: lần thi thử đủ 40 câu gần nhất. Writing/Speaking: bài AI đã chấm gần nhất (điểm bài luyện). Chỉ tính trung bình bốn kỹ năng và làm tròn nửa band khi đủ điểm; không dùng Vocabulary hoặc tỷ lệ đúng bài ngắn. Đây không phải điểm thi IELTS chính thức.</p>
+  </section>
+  <section class="pr-summary" aria-labelledby="pr-summary-title">
+    <div class="pr-block-heading"><div><span class="pr-eyebrow">BỨC TRANH TỔNG QUAN</span><h2 id="pr-summary-title">Những gì bạn đã học</h2></div><p>Chỉ số tổng hợp từ kết quả đã nộp, không tính lượt mở trang.</p></div>
+    <div class="pr-kpis">
+      <article class="pr-kpi pr-kpi-attempts"><span class="pr-kpi-icon" aria-hidden="true">↗</span><div><span>Tổng lượt luyện</span><strong>{{ total_attempts }}</strong><small>Từ 5 module học tập</small></div></article>
+      <article class="pr-kpi"><span class="pr-kpi-icon" aria-hidden="true">▤</span><div><span>Bài / chủ đề đã luyện</span><strong>{{ distinct_contents }}</strong><small>Nội dung khác nhau</small></div></article>
+      <article class="pr-kpi"><span class="pr-kpi-icon" aria-hidden="true">◉</span><div><span>Kỹ năng IELTS đã luyện</span><strong>{{ ielts_skills }}<em>/4</em></strong><small>Vocabulary không tính vào 4 kỹ năng</small><div class="pr-four-pips" aria-label="{{ ielts_skills }} trên 4 kỹ năng đã luyện"><span class="{% if ielts_skills >= 1 %}on{% endif %}"></span><span class="{% if ielts_skills >= 2 %}on{% endif %}"></span><span class="{% if ielts_skills >= 3 %}on{% endif %}"></span><span class="{% if ielts_skills >= 4 %}on{% endif %}"></span></div></div></article>
+      <article class="pr-vocab-summary"><div class="pr-vocab-copy"><span class="pr-kpi-icon" aria-hidden="true">Aa</span><div><span class="pr-vocab-overline">VOCABULARY</span><h3>Vốn từ đang tích lũy</h3><p>Những từ bạn đã thực hành, trả lời đúng và lưu vào kho cá nhân.</p><a href="{% url 'vocabulary:my_words' %}">Mở Từ vựng của tôi <span aria-hidden="true">→</span></a></div></div><div class="pr-vocab-values"><div><strong>{{ practiced_words }}</strong><span>Từ đã thực hành <abbr title="Số từ khác nhau đã có câu trả lời thực tế trong lượt luyện đã nộp. Không đồng nghĩa thành thạo.">ⓘ</abbr></span></div><div><strong>{{ correct_words }}</strong><span>Từ từng trả lời đúng</span></div><div><strong>{{ saved_words }}</strong><span>Từ trong kho cá nhân</span></div><div><strong>{{ marked_learned }}</strong><span>Đã đánh dấu học</span></div></div></article>
+    </div>
+  </section>
+
+  <div class="pr-motivation-grid">
+    <section class="pr-week-panel" aria-labelledby="pr-week-title"><div class="pr-panel-heading"><div><span class="pr-small-label">THÓI QUEN HỌC TẬP</span><h2 id="pr-week-title">Một tuần của bạn</h2></div><span class="pr-week-pill">{{ streak.current }} ngày liên tiếp</span></div>
+      <div class="pr-week-calendar" aria-label="Lịch hoạt động từ thứ hai đến chủ nhật">
+        {% for day in streak.week_calendar %}<div class="pr-week-day {% if day.active %}is-active{% endif %} {% if day.is_today %}is-today{% endif %} {% if day.future %}is-future{% endif %}" title="{{ day.date|date:'d/m/Y' }}{% if day.active %} — Đã học{% endif %}"><span class="pr-week-weekday">{{ day.short }}</span><span class="pr-week-circle" aria-label="{% if day.active %}Đã học{% elif day.future %}Chưa đến ngày{% else %}Chưa có bài nộp{% endif %}">{% if day.active %}✓{% else %}{{ day.date|date:'d' }}{% endif %}</span></div>{% endfor %}
+      </div>
+      <div class="pr-week-foot"><span>Ngày học gần nhất: {% if streak.last_date %}<strong>{{ streak.last_date|date:'d/m/Y' }}</strong>{% else %}<strong>Chưa có</strong>{% endif %}</span><span>Chuỗi dài nhất: <b>{{ streak.longest }} ngày</b></span></div>
+      {% if streak.milestone %}<div class="pr-milestone" role="status"><span aria-hidden="true">✦</span> Bạn đã chạm cột mốc {{ streak.milestone }} ngày học liên tiếp!</div>{% endif %}
+    </section>
+    <section class="pr-nudge pr-nudge--{{ nudge.tone }}" aria-labelledby="pr-nudge-title"><div class="pr-nudge-symbol" aria-hidden="true">{{ nudge.icon }}</div><div><span class="pr-small-label">{% if read_only_admin %}TRẠNG THÁI HỌC TẬP{% else %}GỢI Ý HÔM NAY{% endif %}</span><h2 id="pr-nudge-title">{% if read_only_admin %}{% if streak.inactivity is None %}Học viên chưa luyện tập{% elif streak.inactivity == 0 %}Học viên đã luyện tập hôm nay{% else %}{{ streak.inactivity }} ngày chưa luyện tập{% endif %}{% else %}{{ nudge.title }}{% endif %}</h2><p>{% if read_only_admin %}{{ streak.reminder }}{% else %}{{ nudge.message }}{% endif %}</p>{% if not read_only_admin %}<a href="{% url 'vocabulary:topic_list' %}" class="pr-nudge-action">{{ nudge.action }} →</a>{% endif %}</div></section>
+  </div>
+
+  <section class="pr-section" id="pr-skills" data-progress-section="skills" data-url="{{ section_urls.skills }}">
+    <header class="pr-section-head"><div><span class="pr-eyebrow">THÀNH TÍCH THEO KỸ NĂNG</span><h2>Thống kê theo kỹ năng</h2><p>Mỗi kỹ năng có thang đo riêng: tỷ lệ đúng hoặc Band luyện tập tham khảo.</p></div><button class="pr-toggle" type="button" aria-expanded="false" aria-controls="pr-skills-details">Xem thống kê chi tiết <span aria-hidden="true">↓</span></button></header>
+    <div class="pr-skill-grid">{% for skill in skills %}<article class="pr-skill pr-skill--{{ skill.skill|lower }}"><div class="pr-skill-top"><span class="pr-skill-icon" aria-hidden="true">{% if skill.skill == 'LISTENING' %}♫{% elif skill.skill == 'READING' %}▤{% elif skill.skill == 'WRITING' %}✎{% elif skill.skill == 'SPEAKING' %}◉{% else %}Aa{% endif %}</span><span class="pr-skill-name">{{ skill.label }}</span></div><strong>{{ skill.total }} <small>lượt</small></strong>{% if skill.average is not None %}<div class="pr-skill-meter" role="img" aria-label="Trung bình {{ skill.average }} {{ skill.unit }}"><span style="width:{{ skill.meter_percent|stringformat:'.1f' }}%"></span></div><span class="pr-skill-foot">TB {{ skill.average }} {{ skill.unit }}{% if skill.unit == 'Band' %} / 9{% endif %}</span>{% else %}<div class="pr-skill-no-data">Chưa có kết quả có điểm</div>{% endif %}</article>{% endfor %}</div>
+    <div id="pr-skills-details" class="pr-section-details" hidden aria-live="polite"></div>
+  </section>
+
+  <section class="pr-section pr-timeline" id="pr-chart" data-progress-section="chart" data-url="{{ section_urls.chart }}">
+    <header class="pr-section-head"><div><span class="pr-eyebrow">XU HƯỚNG HỌC TẬP</span><h2>Tiến độ theo thời gian</h2><p>Theo dõi Band tham khảo của từng kỹ năng qua mỗi bài đã nộp.</p></div><button type="button" class="pr-toggle" aria-expanded="false" aria-controls="pr-chart-details">Xem biểu đồ chi tiết <span aria-hidden="true">↓</span></button></header>
+    <div class="dol-band-chart-grid">{% for series in band_charts %}{% include 'progress/_band_chart.html' with series=series %}{% endfor %}</div>
+    <p class="pr-note">30 ngày gần nhất · Tối đa 30 kết quả mỗi kỹ năng. Reading/Listening chỉ lấy đề thi thử 40 câu; Writing/Speaking lấy bài đã chấm.</p>
+    <div id="pr-chart-details" class="pr-section-details" hidden aria-live="polite"></div>
+  </section>
+
+  <section class="pr-section" id="pr-history" data-progress-section="history" data-url="{{ section_urls.history }}">
+    <header class="pr-section-head"><div><span class="pr-eyebrow">HÀNH TRÌNH VỪA QUA</span><h2>Lịch sử luyện tập</h2></div><button type="button" class="pr-toggle" aria-expanded="false" aria-controls="pr-history-details">Xem toàn bộ lịch sử <span aria-hidden="true">↓</span></button></header>
+    <div class="pr-history-preview">{% for row in recent %}<div class="pr-history-row"><span class="pr-activity-symbol" aria-hidden="true">{% if row.skill == 'LISTENING' %}♫{% elif row.skill == 'READING' %}▤{% elif row.skill == 'WRITING' %}✎{% elif row.skill == 'SPEAKING' %}◉{% else %}Aa{% endif %}</span><div class="pr-record"><span class="pr-record-category">{{ row.label }}</span><b>{{ row.title }}</b><small>{{ row.submitted_at|date:'d/m/Y H:i' }} · {{ row.status }}</small></div><strong>{% if row.exam_band is not None %}{{ row.exam_band }} Band{% elif row.score is not None %}{{ row.score }} {{ row.unit }}{% else %}Chưa có điểm{% endif %}</strong>{% if read_only_admin %}<span class="pr-readonly-note">Chỉ xem</span>{% else %}<a href="{{ row.url }}">Xem kết quả <span aria-hidden="true">↗</span></a>{% endif %}</div>{% empty %}<div class="pr-empty">Chưa có bài nộp. Lịch sử sẽ xuất hiện sau lần luyện đầu tiên.</div>{% endfor %}</div>
+    <div id="pr-history-details" class="pr-section-details" hidden aria-live="polite"></div>
+  </section>
+</div>
+<script>
+(() => {
+  'use strict';
+  const root = document.getElementById('progress-overview'); if (!root) return;
+  function loading(panel) {panel.innerHTML='<div class="pr-loading" role="status"><span></span><span></span><span></span><em>Đang tải dữ liệu…</em></div>';}
+  async function load(section, query) {
+    const target = section.querySelector('.pr-section-details'); loading(target);
+    try {
+      const url = new URL(section.dataset.url,location.origin);
+      if (query) for (const [key,value] of new URLSearchParams(query)) url.searchParams.set(key,value);
+      const response=await fetch(url.toString(),{credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest'}});
+      if(!response.ok)throw new Error('Load failed');
+      target.innerHTML=await response.text(); target.dataset.loaded='1';
+    } catch(error) {target.innerHTML='<p class="pr-empty" role="alert">Không tải được dữ liệu. Hãy thu gọn rồi mở lại để thử lần nữa.</p>';delete target.dataset.loaded;}
+  }
+  root.querySelectorAll('[data-progress-section]').forEach(section => {
+    const button=section.querySelector('.pr-toggle'),panel=section.querySelector('.pr-section-details');
+    const initialText=button.textContent.trim();
+    button.addEventListener('click',()=>{
+      const opening=panel.hidden; panel.hidden=!opening;
+      button.setAttribute('aria-expanded',String(opening));
+      button.innerHTML=opening?'Thu gọn <span aria-hidden="true">↑</span>':initialText+' <span aria-hidden="true">↓</span>';
+      if(opening&&!panel.dataset.loaded)load(section);
+    });
+    section.addEventListener('submit',event=>{const form=event.target.closest('form[data-progress-filter]');if(!form)return;event.preventDefault();load(section,new URLSearchParams(new FormData(form)));});
+    section.addEventListener('click',event=>{const link=event.target.closest('a[data-progress-page]');if(!link)return;event.preventDefault();load(section,new URL(link.href,location.origin).searchParams);});
+  });
+})();
+</script>

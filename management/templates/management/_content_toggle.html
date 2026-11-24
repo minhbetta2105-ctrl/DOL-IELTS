@@ -1,0 +1,1 @@
+<form method="post" action="{{ action }}">{% csrf_token %}{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}<button class="ml-btn {% if status == 'PUBLISHED' %}danger{% endif %}" type="submit">{% if status == 'PUBLISHED' %}Ẩn{% else %}Hiện{% endif %}</button></form>

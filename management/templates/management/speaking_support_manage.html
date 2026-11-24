@@ -1,0 +1,2 @@
+{% extends 'management/support_base.html' %}
+{% block support_content %}{% include 'management/_support_editor.html' with selected=selected_exercise items=exercises manage_url='management:speaking_support_manage' detail_url='management:speaking_exercise_detail' create_url='management:speaking_exercise_create' %}{% endblock %}

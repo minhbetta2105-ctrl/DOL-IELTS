@@ -1,0 +1,11 @@
+{% extends 'productive/result_base.html' %}
+{% block title %}Kết quả Writing | {{ snapshot.title }}{% endblock %}
+{% block skill_link %}<a href="{% url 'writing:prompt_list' %}">Writing</a>{% endblock %}
+{% block breadcrumbs %}<span>/</span><span>Kết quả bài luyện</span>{% endblock %}
+{% block report_label %}Writing{% endblock %}
+{% block report_type %}<span>{% if snapshot.task_type == 'TASK_1' %}Task 1{% else %}Task 2{% endif %}</span>{% endblock %}
+{% block report_actions %}<a class="btn btn-outline" href="{% url 'writing:prompt_detail' submission.prompt_id %}">Luyện lại</a><a class="btn btn-primary" href="{% url 'writing:prompt_list' %}">Kho đề khác →</a>{% endblock %}
+{% block score_note %}<p class="pd-muted">{{ content_words }} từ · Mục tiêu {% if snapshot.task_type == 'TASK_1' %}150{% else %}250{% endif %}+ từ</p>{% endblock %}
+{% block answer_heading %}<h2>Bài viết đã nộp <small>{{ content_words }} từ</small></h2>{% endblock %}
+{% block answer_text %}{{ submission.content }}{% endblock %}
+{% block rubric_link %}<a href="https://ielts.org/cdn/ielts-guides/ielts-writing-band-descriptors.pdf" target="_blank" rel="noopener noreferrer">IELTS Writing Band Descriptors (Public Version - May 2023)</a>{% endblock %}

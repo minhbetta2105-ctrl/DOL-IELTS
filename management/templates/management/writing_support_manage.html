@@ -1,0 +1,2 @@
+{% extends 'management/support_base.html' %}
+{% block support_content %}{% include 'management/_support_editor.html' with selected=selected_prompt items=prompts manage_url='management:writing_support_manage' detail_url='management:writing_prompt_detail' create_url='management:writing_prompt_create' %}{% endblock %}

@@ -1,0 +1,5 @@
+{% if page_obj.paginator.num_pages > 1 %}<nav class="fb-pagination" aria-label="Phân trang" style="display:flex;gap:16px;justify-content:center;align-items:center;margin:24px 0;">
+{% if page_obj.has_previous %}<a href="?{% if page_query %}{{ page_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">← Trước</a>{% endif %}
+<span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+{% if page_obj.has_next %}<a href="?{% if page_query %}{{ page_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Sau →</a>{% endif %}
+</nav>{% endif %}

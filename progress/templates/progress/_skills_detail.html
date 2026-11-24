@@ -1,0 +1,10 @@
+<div class="pr-skill-detail-grid">
+{% for s in skills %}<article class="pr-detail-card"><h3>{{ s.label }}</h3>
+<div><span>Lượt luyện</span><b>{{ s.total }}</b></div><div><span>Số bài/chủ đề</span><b>{{ s.contents }}</b></div>
+<div><span>Lượt có điểm</span><b>{{ s.scored }}</b></div>
+<div><span>Trung bình</span><b>{% if s.average is not None %}{{ s.average }} {{ s.unit }}{% else %}—{% endif %}</b></div>
+<div><span>Tốt nhất</span><b>{% if s.best is not None %}{{ s.best }} {{ s.unit }}{% else %}—{% endif %}</b></div>
+<div><span>Gần nhất có điểm</span><b>{% if s.latest is not None %}{{ s.latest }} {{ s.unit }}{% else %}—{% endif %}</b></div>
+<div><span>Lần luyện gần nhất</span><b>{% if s.last_date %}{{ s.last_date|date:'d/m/Y' }}{% else %}—{% endif %}</b></div>
+</article>{% endfor %}
+</div><p class="pr-note">Điểm Band của Writing/Speaking là điểm ước tính do AI đánh giá, không được tính chung với tỷ lệ đúng của các kỹ năng khác.</p>

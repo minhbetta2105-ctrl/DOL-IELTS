@@ -1,0 +1,66 @@
+{% extends 'core/workspace_base.html' %}
+{% load static receptive_tags %}
+{% block title %}{{ exercise.title }} · {{ skill_label }}{% endblock %}
+{% block module_styles %}<link rel="stylesheet" href="{% static 'css/receptive-test.css' %}">{% endblock %}
+{% block skill_link %}<a href="{% url list_url_name %}">{{ skill_label }}</a>{% endblock %}
+{% block breadcrumbs %}<span>/</span><span>{{ exercise.title }}</span>{% endblock %}
+{% block workspace_layout %}
+<div class="rt-test" id="rt-test" data-audio-available="{% if audio_available %}1{% else %}0{% endif %}" data-exam="{% if is_exam %}1{% else %}0{% endif %}" data-deadline="{{ deadline }}" data-session="{{ submission_key }}" data-start="{{ started_at }}" data-skill="{{ ns }}">
+  <header class="rt-test-header">
+    <div><p class="rt-eyebrow">{% if is_exam %}{% if full_test %}Thi thử{% else %}Kiểm tra bài ngắn{% endif %}{% else %}Luyện tập · Tự do{% endif %}</p><h1>{{ exercise.title }}</h1><p>{{ total_questions }} câu hỏi · {% if is_exam %}{{ exam_minutes }} phút{% else %}Không giới hạn thời gian{% endif %}</p></div>
+    <div class="rt-test-status"><strong id="rt-timer" role="timer" aria-label="Thời gian làm bài">00:00</strong><span id="rt-count">0/{{ total_questions }} đã làm</span><button type="button" class="btn btn-primary rt-submit-open"{% if not audio_available %} disabled{% endif %}>Nộp bài</button></div>
+  </header>
+  <div class="rt-hint" role="note">Bài chưa nộp sẽ không được lưu nếu bạn thoát hoặc tải lại trang.</div>
+  {% if ns == 'reading' %}<div class="rt-mobile-tabs"><button type="button" class="rt-mobile-tab is-active" data-pane="material">Bài đọc</button><button type="button" class="rt-mobile-tab" data-pane="questions">Câu hỏi</button></div>{% endif %}
+  <form method="post" action="{% url submit_url_name exercise.pk %}" id="rt-form">
+    {% csrf_token %}<input type="hidden" name="submission_key" value="{{ submission_key }}"><input type="hidden" name="started_at" value="{{ started_at }}"><input type="hidden" name="mode" value="{{ mode }}">
+    <div class="rt-split {% if ns == 'listening' %}rt-listening-split{% endif %}">
+      <section class="rt-pane rt-pane-material" id="rt-pane-material" aria-label="{% if ns == 'reading' %}Bài đọc{% else %}Bài nghe{% endif %}">
+        {% if ns == 'reading' %}
+        <div class="rt-pane-heading"><h2>Bài đọc</h2><div class="rt-passage-tools"><button type="button" id="rt-smaller" aria-label="Giảm cỡ chữ">A−</button><button type="button" id="rt-larger" aria-label="Tăng cỡ chữ">A+</button></div></div>
+        {% if passage_sections|length > 1 %}<nav class="study-passage-tabs" aria-label="Chọn đoạn đọc">{% for section in passage_sections %}<button type="button" data-passage-tab="{{ section.number }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">Passage {{ section.number }}<small>Câu {{ section.first }}–{{ section.last }}</small></button>{% endfor %}</nav>{% endif %}
+        <div class="rt-passage" id="rt-passage">{% for section in passage_sections %}<section class="study-passage" data-passage="{{ section.number }}" data-first="{{ section.first }}" data-last="{{ section.last }}"><div class="study-passage-heading"><span>PASSAGE {{ section.number }} · Câu {{ section.first }}–{{ section.last }}</span><h3>{{ section.title }}</h3></div>{% if section.preamble %}<p>{{ section.preamble }}</p>{% endif %}<div class="study-passage-text">{{ section.body|linebreaks }}</div></section>{% endfor %}</div>
+        <div class="rt-passage-note">Có thể bôi đen đoạn văn để đánh dấu tạm trong lượt làm bài này. Đánh dấu không được lưu khi tải lại.</div>
+        <div class="rt-annotation-tools" id="rt-annotation-tools" hidden><button type="button" id="rt-highlight">Tô nổi bật</button><button type="button" id="rt-note">Ghi chú</button><button type="button" id="rt-clear-annotations">Xóa đánh dấu</button></div>
+        {% else %}
+        <div class="rt-pane-heading"><h2>Bài nghe</h2><span class="rt-playing" id="rt-play-state">Sẵn sàng</span></div>
+        {% if audio_available %}
+        <audio id="rt-audio" preload="metadata" playsinline src="{% url 'listening:exercise_audio' exercise.pk %}" aria-label="Audio bài Listening"></audio>
+        <div class="rt-audio-controls">
+          <button type="button" id="rt-audio-play" class="rt-audio-primary">Bắt đầu bài nghe</button>
+          <div class="rt-audio-progress"><input id="rt-audio-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Vị trí âm thanh" {% if is_exam %}disabled{% endif %}><div class="rt-audio-times"><span id="rt-audio-current">00:00</span><span id="rt-audio-total">--:--</span></div></div>
+          <div class="rt-audio-actions"><button type="button" id="rt-audio-back" {% if is_exam %}disabled{% endif %}>−5s</button><button type="button" id="rt-audio-forward" {% if is_exam %}disabled{% endif %}>+5s</button><label for="rt-audio-speed">Tốc độ</label><select id="rt-audio-speed" {% if is_exam %}disabled{% endif %}><option value="0.75">0.75×</option><option value="1" selected>1.0×</option><option value="1.25">1.25×</option></select></div>
+        </div>
+        <div class="rt-volume"><label for="rt-audio-volume">Âm lượng</label><input id="rt-audio-volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Âm lượng"></div><p id="rt-audio-help" class="rt-passage-note" role="alert" hidden>Không thể phát bằng trình điều khiển này. <a href="{% url 'listening:exercise_audio' exercise.pk %}" target="_blank" rel="noopener">Mở trực tiếp file âm thanh</a> để kiểm tra hoặc dùng trình phát mặc định.</p>
+        <p class="rt-passage-note">{% if is_exam %}Thi thử: nghe một lượt ở tốc độ 1.0×.{% else %}Luyện tập: có thể dừng, tua và đổi tốc độ.{% endif %}</p>
+        {% else %}<div class="rt-empty"><h3>Chưa có file âm thanh</h3><p>Giáo viên cần bổ sung audio hợp lệ trước khi học viên làm bài này.</p></div>{% endif %}
+        <div class="rt-listen-tips"><h3>Hướng dẫn</h3><p>Đọc trước câu hỏi, nghe các ý chính và ghi đáp án ở phần câu hỏi. Với câu điền từ, nhập đúng từ, cụm từ hoặc số cần thiết; với câu trắc nghiệm, chọn một đáp án. Nội dung transcript nếu có sẽ xuất hiện sau khi nộp bài.</p></div>
+        {% endif %}
+      </section>
+      <section class="rt-pane rt-pane-questions" id="rt-pane-questions" aria-label="Câu hỏi">
+        <div class="rt-pane-heading"><h2>Câu hỏi</h2><span>{{ total_questions }} câu</span></div>
+        {% for q in questions %}
+        {% if q.section_heading %}<h3 class="rt-part-heading">{{ q.section_heading }}</h3>{% endif %}
+        <article id="rt-q-{{ q.pk }}" data-question-id="{{ q.pk }}" data-order="{{ q.order_no }}" class="rt-question" tabindex="-1">
+          <div class="rt-question-top"><span class="rt-question-number">Câu {{ q.order_no }}</span><span class="rt-question-type">{{ q.get_question_type_display }}</span><button type="button" class="rt-flag" data-flag="{{ q.pk }}" aria-pressed="false" aria-label="Đánh dấu xem lại câu {{ q.order_no }}">Đánh dấu</button></div>
+          <h3>{{ q.question_text }}</h3>
+          {% if q.question_type == 'SHORT_TEXT' %}
+            <label class="rt-sr-only" for="rt-answer-{{ q.pk }}">Câu trả lời câu {{ q.order_no }}</label><input id="rt-answer-{{ q.pk }}" type="text" name="answer_{{ q.pk }}" autocomplete="off" class="rt-text-input" placeholder="Nhập câu trả lời...">
+          {% else %}
+            <fieldset class="rt-options"><legend class="rt-sr-only">Chọn đáp án câu {{ q.order_no }}</legend>
+              {% for opt in q.options.all %}<label class="rt-option"><input type="radio" name="answer_{{ q.pk }}" value="{{ opt.option_key }}"><span>{{ opt|option_label }}</span></label>{% empty %}<p>Chưa có phương án trả lời cho câu này.</p>{% endfor %}
+            </fieldset>
+          {% endif %}
+        </article>
+        {% empty %}<div class="rt-empty">Chưa có câu hỏi được công bố.</div>{% endfor %}
+      </section>
+    <nav class="rt-bottom-nav" aria-label="Điều hướng câu hỏi">
+      <h2>Danh sách câu hỏi</h2><p class="rt-nav-help">Chọn số để chuyển câu.</p><div class="rt-question-nav" aria-label="Chọn câu hỏi">{% for q in questions %}<button type="button" class="rt-qnav" data-target="{{ q.pk }}" aria-label="Đi đến câu {{ q.order_no }}">{{ q.order_no }}</button>{% endfor %}</div><div class="rt-nav-legend"><span><i class="answered"></i>Đã làm</span><span><i class="flagged"></i>Đánh dấu</span></div><div class="rt-nav-pair"><button type="button" class="rt-nav-prev">Trước</button><button type="button" class="rt-nav-next">Tiếp</button></div><button type="button" class="btn btn-primary rt-submit-open"{% if not audio_available %} disabled{% endif %}>Nộp bài</button>
+    </nav>
+    </div>
+    <noscript><p>Vui lòng bật JavaScript để sử dụng đồng hồ và thanh điều hướng. <button class="btn btn-primary" type="submit">Nộp bài</button></p></noscript>
+  </form>
+  <dialog id="rt-submit-dialog" class="rt-submit-dialog" aria-labelledby="rt-submit-title"><h2 id="rt-submit-title">Xác nhận nộp bài</h2><p id="rt-submit-summary">Bạn có muốn nộp bài?</p><div class="rt-dialog-actions"><button type="button" class="btn btn-outline" id="rt-cancel">Tiếp tục làm</button><button type="button" class="btn btn-primary" id="rt-confirm">Xác nhận nộp</button></div></dialog>
+</div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/receptive-test.js' %}?v=4" defer></script>{% endblock %}

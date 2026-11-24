@@ -1,0 +1,28 @@
+{% extends 'management/content_list_base.html' %}
+{% load vocab_tags %}
+{% block managed_skill %}Vocabulary{% endblock %}
+{% block managed_description %}Quản lý chủ đề từ vựng và trạng thái hiển thị. Chủ đề đã có lịch sử chỉ được ẩn.{% endblock %}
+{% block managed_actions %}<a class="ml-btn primary" href="{% url 'vocabulary:topic_create' %}">+ Thêm chủ đề</a>{% endblock %}
+{% block managed_query %}{{ q }}{% endblock %}
+{% block managed_count %}{{ total }} chủ đề · {{ shown }} hiện · {{ hidden }} ẩn{% endblock %}
+{% block managed_rows %}{% for t in rows %}<tr><td class="ml-id">#{{ t.pk }}</td><td class="ml-name"><strong><a href="{% url 'vocabulary:manage_words' topic_id=t.pk %}">{{ t.name }}</a></strong><small>{% if t.has_history %}Đã có lịch sử luyện tập{% else %}Chưa có lịch sử{% endif %}</small></td><td>{{ t.word_total }} từ</td><td><span class="ml-level">{{ t.level|level_vi }}</span></td><td>{% include 'management/_content_status.html' with status=t.status only %}</td><td><div class="ml-actions">
+            <a class="ml-btn" href="{% url 'vocabulary:topic_edit' pk=t.pk %}">Sửa</a>
+            <form method="post" action="{% url 'vocabulary:topic_set_status' pk=t.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="{% if t.status == 'PUBLISHED' %}HIDDEN{% else %}PUBLISHED{% endif %}">
+              <button class="ml-btn danger" type="submit">{% if t.status == "PUBLISHED" %}Ẩn{% else %}Hiện{% endif %}</button>
+            </form>
+            {% if not t.has_history %}
+            <form method="post" action="{% url 'vocabulary:topic_delete' pk=t.pk %}" onsubmit="return confirm('Xóa vĩnh viễn chủ đề này?')">
+              {% csrf_token %}<button class="ml-btn" type="submit">Xóa</button>
+            </form>
+            {% endif %}
+          </div></td></tr>{% empty %}<tr><td colspan="6" class="ml-empty">Không tìm thấy nội dung phù hợp.</td></tr>{% endfor %}{% endblock %}
+{% block managed_footer %}<div class="ml-footer">
+    <span>Hiển thị {{ rows|length }} trên tổng số {{ page_obj.paginator.count }} chủ đề</span>
+    <span class="pager">
+      {% if page_obj.has_previous %}<a href="?q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}">Trang trước</a>{% endif %}
+      Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}<a href="?q={{ q|urlencode }}&page={{ page_obj.next_page_number }}">Trang sau</a>{% endif %}
+    </span>
+  </div>{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Cộng đồng đánh giá | DOL IELTS Đình Lực{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/feedback-community.css' %}">{% endblock %}
+{% block content %}
+<section class="fb-community">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Trang chủ</a> <span>›</span> Đánh giá &amp; chia sẻ</div>
+  <header class="fb-hero" data-dol-reveal>
+    <div class="fb-hero-copy">
+      <span class="fb-eyebrow">CỘNG ĐỒNG HỌC VIÊN DOL</span>
+      <h1>Lắng nghe <em>Dolbie</em><br>chia sẻ.</h1>
+      <p>Mỗi trải nghiệm đều có giá trị. Hãy chia sẻ những điều bạn yêu thích và góp ý để DOL ngày càng tốt hơn.</p>
+      <div class="fb-hero-actions">
+        {% if editing %}<a class="fb-primary" href="{% url 'feedback:feedback_submit' %}">＋ Viết đánh giá</a>{% else %}<button class="fb-primary" type="button" data-open-review>＋ Viết đánh giá</button>{% endif %}
+        <a class="fb-outline" href="#fb-reviews">Khám phá chia sẻ ↓</a>
+      </div>
+    </div>
+    <div class="fb-hero-art" aria-hidden="true">
+      <div class="fb-orbit"></div>
+      <div class="fb-art-card fb-art-back"><span>“</span><i></i><i></i></div>
+      <div class="fb-art-card fb-art-front"><div class="fb-art-icon">✦</div><strong>Tiếng nói của bạn</strong><div class="fb-art-stars">★★★★★</div><small>Góp ý để cùng tiến bộ</small></div>
+      <div class="fb-art-dot">✓</div>
+    </div>
+  </header>
+  <section class="fb-summary" aria-label="Tổng quan đánh giá">
+    <div class="fb-average"><span>Đánh giá trung bình</span><strong>{% if stats.rated_count %}{{ stats.average|floatformat:1 }}<small>/5</small>{% else %}—{% endif %}</strong><div class="fb-stars" aria-hidden="true">{% for row in stats.distribution reversed %}<span {% if row.star > stats.average_stars %}class="fb-star-off"{% endif %}>★</span>{% endfor %}</div><span>{% if stats.rated_count %}{{ stats.rated_count }} đánh giá công khai{% else %}Chưa có đánh giá công khai{% endif %}</span></div>
+    <div class="fb-distribution"><span class="fb-summary-label">Phân bố mức độ hài lòng</span>{% for row in stats.distribution %}<a class="fb-dist-row" href="{% url 'feedback:feedback_submit' %}?rating={{ row.star }}#fb-reviews" aria-label="Xem {{ row.count }} đánh giá {{ row.star }} sao"><span>{{ row.star }} ★</span><div class="fb-track"><div style="width:{{ row.percent }}%"></div></div><span>{{ row.count }}</span></a>{% endfor %}</div>
+    <div class="fb-metrics"><div><strong>{{ stats.reviewer_count }}</strong><span>Học viên đã chia sẻ</span></div><div><strong>{{ stats.month_count }}</strong><span>Đánh giá trong tháng</span></div><div><strong>{% if stats.rated_count %}{{ stats.positive_percent }}%{% else %}—{% endif %}</strong><span>Hài lòng (4–5 sao)</span></div></div>
+  </section>
+  <div class="fb-layout" id="fb-reviews">
+    <section class="fb-feed" aria-labelledby="fb-feed-title">
+      <div class="fb-section-head"><div><span class="fb-eyebrow">GÓC NHÌN HỌC VIÊN</span><h2 id="fb-feed-title">Chia sẻ từ cộng đồng</h2><p>Lắng nghe những trải nghiệm học tập tại DOL.</p></div></div>
+      <nav class="fb-tabs" aria-label="Danh sách đánh giá"><a class="{% if tab == 'all' %}is-active{% endif %}" {% if tab == 'all' %}aria-current="page"{% endif %} href="{% url 'feedback:feedback_submit' %}#fb-reviews">Tất cả <span>{{ stats.review_count }}</span></a><a class="{% if tab == 'mine' %}is-active{% endif %}" {% if tab == 'mine' %}aria-current="page"{% endif %} href="{% url 'feedback:feedback_submit' %}?tab=mine#fb-reviews">Của tôi <span>{{ mine_count }}</span></a></nav>
+      <form class="fb-filter" method="get" action="{% url 'feedback:feedback_submit' %}#fb-reviews">
+        <input type="hidden" name="tab" value="{{ tab }}">
+        <div class="fb-search"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ search_q }}" placeholder="Tìm nội dung đánh giá…" aria-label="Tìm nội dung đánh giá" maxlength="150"></div>
+        <select name="rating" aria-label="Lọc theo số sao"><option value="">Tất cả số sao</option>{% for row in stats.distribution %}<option value="{{ row.star }}" {% if rating_filter == row.star|stringformat:'s' %}selected{% endif %}>{{ row.star }} sao</option>{% endfor %}{% if tab == 'mine' %}<option value="unrated" {% if rating_filter == 'unrated' %}selected{% endif %}>Chưa chấm sao</option>{% endif %}</select>
+        <select name="sort" aria-label="Sắp xếp"><option value="newest" {% if sort == 'newest' %}selected{% endif %}>Mới nhất</option><option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Cũ nhất</option><option value="highest" {% if sort == 'highest' %}selected{% endif %}>Sao cao nhất</option><option value="lowest" {% if sort == 'lowest' %}selected{% endif %}>Sao thấp nhất</option></select>
+        <button class="fb-outline" type="submit">Lọc</button>
+      </form>
+      <div class="fb-results"><span>{{ page_obj.paginator.count }} đánh giá{% if filter_active %} phù hợp{% endif %}</span>{% if filter_active %}<a class="fb-reset" href="{% url 'feedback:feedback_submit' %}?tab={{ tab }}#fb-reviews">Xóa bộ lọc ×</a>{% endif %}</div>
+      <div class="fb-grid">
+        {% for item in page_obj %}
+        <article class="fb-card">
+          <div class="fb-card-top"><div class="fb-avatar" aria-hidden="true">{{ item.user.first_name|default:'D'|slice:':1'|upper }}</div><div class="fb-author"><strong>{% if item.user.first_name %}{{ item.user.first_name }}{% else %}Học viên DOL{% endif %}</strong><time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:'d/m/Y' }}{% if item.user_id == request.user.pk %} · Bạn{% endif %}</time></div><span class="fb-quote" aria-hidden="true">“</span></div>
+          {% if item.rating %}<div class="fb-stars" aria-label="{{ item.rating }} trên 5 sao">{% for row in stats.distribution reversed %}<span {% if row.star > item.rating %}class="fb-star-off"{% endif %}>★</span>{% endfor %} <small>{{ item.rating }}/5</small></div>{% else %}<span class="fb-muted">Chưa chấm sao</span>{% endif %}
+          <div class="fb-review-text" id="review-{{ item.pk }}">{{ item.content|linebreaksbr }}</div>
+          <button type="button" class="fb-more" data-expand="review-{{ item.pk }}" aria-controls="review-{{ item.pk }}" aria-expanded="false" hidden>Đọc toàn bộ →</button>
+          {% if tab == 'mine' %}<div class="fb-card-footer"><span class="fb-status {% if item.rating and item.is_visible %}fb-status-public{% endif %}">{% if not item.is_visible %}Đã ẩn{% elif not item.rating %}Góp ý riêng tư cũ{% else %}Đang công khai{% endif %}</span><a href="{% url 'feedback:feedback_edit' item.pk %}">Chỉnh sửa</a></div>{% endif %}
+        </article>
+        {% empty %}
+        <div class="fb-empty"><div class="fb-empty-icon" aria-hidden="true">“</div><h3>{% if filter_active %}Không tìm thấy đánh giá phù hợp{% elif tab == 'mine' %}Bạn chưa có đánh giá{% else %}Hãy là người đầu tiên chia sẻ{% endif %}</h3><p>{% if filter_active %}Thử đổi bộ lọc hoặc từ khóa tìm kiếm.{% else %}Trải nghiệm của bạn có thể giúp những học viên khác và giúp DOL cải thiện mỗi ngày.{% endif %}</p>{% if filter_active %}<a class="fb-outline" href="{% url 'feedback:feedback_submit' %}?tab={{ tab }}#fb-reviews">Xóa bộ lọc</a>{% elif not editing %}<button type="button" class="fb-primary" data-open-review>Viết đánh giá</button>{% endif %}</div>
+        {% endfor %}
+      </div>
+      {% include 'feedback/_pagination.html' %}
+    </section>
+    <aside class="fb-side" aria-label="Hướng dẫn đánh giá">
+      <div class="fb-side-card"><span class="fb-eyebrow">CHIA SẺ CÓ ÍCH</span><h3>Viết đánh giá như thế nào?</h3><p>Hãy kể về trải nghiệm thật của bạn, dù tích cực hay chưa hài lòng.</p><div class="fb-guide"><span>01</span><div><strong>Trải nghiệm học tập</strong><small>Bài luyện tập, nội dung và mức độ phù hợp.</small></div></div><div class="fb-guide"><span>02</span><div><strong>Tính năng website</strong><small>Giao diện, chấm bài, thống kê tiến độ.</small></div></div><div class="fb-guide"><span>03</span><div><strong>Điều cần cải thiện</strong><small>Góp ý cụ thể, tôn trọng người khác.</small></div></div></div>
+      <div class="fb-side-note"><strong>Quyền riêng tư &amp; kiểm duyệt</strong><p>Chỉ chia sẻ tên riêng, số sao và nội dung bạn đồng ý công khai. Không đăng thông tin cá nhân nhạy cảm. Quản trị viên có thể ẩn nội dung không phù hợp.</p><a href="{% url 'feedback:feedback_submit' %}?tab=mine#fb-reviews">Xem đánh giá của tôi →</a></div>
+    </aside>
+  </div>
+  <dialog class="fb-dialog" id="fb-editor" {% if editing %}data-edit-return="{% url 'feedback:feedback_submit' %}?tab=mine#fb-reviews"{% endif %} {% if open_editor %}open data-auto-open{% endif %} aria-labelledby="fb-editor-title">
+    <div class="fb-dialog-head"><div><span class="fb-eyebrow">TRẢI NGHIỆM CỦA BẠN</span><h2 id="fb-editor-title">{% if editing %}Chỉnh sửa đánh giá{% else %}Bạn thấy DOL thế nào?{% endif %}</h2></div><button type="button" class="fb-close" data-close-review aria-label="Đóng">×</button></div>
+    <div class="fb-editor-user"><div class="fb-avatar" aria-hidden="true">{{ request.user.first_name|default:'D'|slice:':1'|upper }}</div><div><strong>{{ request.user.first_name|default:'Học viên DOL' }}</strong><small>Tên hiển thị cùng đánh giá</small></div></div>
+    <form method="post" action="{% if editing %}{% url 'feedback:feedback_edit' editing.pk %}{% else %}{% url 'feedback:feedback_submit' %}{% endif %}" data-review-form>
+      {% csrf_token %}{{ form.non_field_errors }}
+      <fieldset class="fb-star-select"><legend>Mức độ hài lòng</legend><div class="fb-star-options">{% for radio in form.rating %}<label class="fb-rating-choice" title="{{ radio.choice_label }} sao">{{ radio.tag }}<span aria-hidden="true">★</span><span class="fb-sr">{{ radio.choice_label }} sao</span></label>{% endfor %}</div><small id="fb-star-label" aria-live="polite">Chọn từ 1 đến 5 sao</small>{{ form.rating.errors }}</fieldset>
+      <label for="{{ form.content.id_for_label }}">Nội dung đánh giá</label><small class="fb-muted" id="fb-content-hint">Tối thiểu 5, tối đa 2000 ký tự.</small>{{ form.content }}{{ form.content.errors }}<div class="fb-count" id="fb-count">Tối đa 2000 ký tự</div>
+      <div class="fb-notice"><label class="fb-consent">{{ form.publish }}<span>Tôi đồng ý chia sẻ số sao, nội dung và tên hiển thị với các học viên khác.</span></label>{{ form.publish.errors }}<p>Không nhập thông tin nhạy cảm. {% if editing and not editing.is_visible %}Đánh giá đang bị ẩn sẽ tiếp tục bị ẩn sau khi sửa.{% endif %}</p></div>
+      <div class="fb-dialog-actions"><button type="button" class="fb-outline" data-close-review>Hủy</button><button class="fb-primary" type="submit" data-submit-review>{% if editing %}Lưu thay đổi{% else %}Đăng đánh giá{% endif %}</button></div>
+    </form>
+  </dialog>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/feedback-community.js' %}" defer></script>{% endblock %}

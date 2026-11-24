@@ -1,0 +1,1 @@
+{% load accounts_tags %}{% if avatar_user|has_avatar %}<img class="dol-avatar-image" src="{% url 'accounts:avatar_image' avatar_user.pk %}" alt="Ảnh đại diện">{% else %}{{ avatar_user|initials }}{% endif %}

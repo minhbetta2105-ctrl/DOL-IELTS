@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_head %}{% block module_styles %}{% endblock %}{% block extra_css %}{% endblock %}{% endblock %}
+{% block final_styles %}<link rel="stylesheet" href="{% static 'css/productive.css' %}"><link rel="stylesheet" href="{% static 'css/skill-unified.css' %}"><link rel="stylesheet" href="{% static 'css/study-workspace.css' %}?v=7">{% endblock %}
+{% block content %}
+<nav class="breadcrumb-bar" aria-label="Đường dẫn"><div class="breadcrumb-inner"><a href="{% url 'home' %}">Trang chủ</a><span aria-hidden="true">/</span>{% block skill_link %}{% endblock %}{% block breadcrumbs %}{% endblock %}</div></nav>
+<div class="main-container dol-skill-content">{% block module_content %}{% endblock %}</div>
+{% endblock %}

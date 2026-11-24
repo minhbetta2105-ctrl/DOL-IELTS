@@ -1,0 +1,4 @@
+<header class="dol-module-hero{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="dol-module-copy"><p class="dol-eyebrow">DOL IELTS / {{ label }}</p><h1>{% if label == "Vocabulary" %}Học <span class="dol-skill-name">từ vựng</span>{% else %}Luyện tập <span class="dol-skill-name">{{ label }}</span>{% endif %}</h1><p class="dol-module-description">{{ description }}</p>{% if count or count == 0 %}<span class="dol-module-count">{{ count }} {{ count_label|default:'bài luyện' }}</span>{% endif %}</div>
+  <div class="dol-module-art" aria-hidden="true"><div class="dol-module-orbit"></div>{% load static %}<img class="dol-skill-art" src="{% static 'images/skills/' %}{{ icon }}.svg" alt=""></div>
+</header>

@@ -1,0 +1,9 @@
+{% extends 'management/base_admin.html' %}
+{% load static %}
+{% block title %}Quản lý nội dung hỗ trợ {{ support_skill }} | DOL IELTS{% endblock %}
+{% block teacher_heading %}Quản lý nội dung hỗ trợ {{ support_skill }}{% endblock %}
+{% block management_content %}
+<div class="ms-support">
+<header class="ms-intro"><div><p class="ma-kicker">Tài liệu hỗ trợ</p><h2>Biên tập nội dung <span>{{ support_skill }}</span></h2><p>Chọn bài luyện để cập nhật gợi ý, bài mẫu và từ vựng cho học viên.</p></div><img src="{% static support_icon %}" alt=""></header>
+{% block support_content %}{% endblock %}
+</div>{% endblock %}

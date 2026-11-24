@@ -1,0 +1,6 @@
+{% extends 'management/base_admin.html' %}
+{% load static %}
+{% block title %}Tiến độ học viên | DOL IELTS{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/progress-dashboard.css' %}">{% endblock %}
+{% block teacher_heading %}Tiến độ học viên — Chỉ xem{% endblock %}
+{% block management_content %}{% include 'progress/_dashboard_content.html' %}{% endblock %}

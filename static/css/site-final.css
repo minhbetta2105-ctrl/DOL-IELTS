@@ -1,0 +1,25 @@
+/* Last-mile shared shell overrides AFTER legacy module styles */
+body{font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif!important;background:#F7F8FB}
+.site-global-header{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E4E8EF}
+.site-global-header .brand-logo img{height:52px!important;width:165px!important;max-width:100%!important;object-fit:contain!important}
+.site-global-footer{background:#fff;border-top:1px solid #E4E8EF}
+#main-content{width:100%;flex:1;min-width:0}
+#main-content>.main-container{width:100%;max-width:100%;padding:0;min-height:0}
+#main-content>.breadcrumb-bar{margin:-14px 0 24px;padding:0;background:transparent;border:0}
+#main-content .breadcrumb-inner{max-width:100%;padding:0}
+#main-content>.admin-main{max-width:100%;width:100%;padding:0;min-height:0}
+@media(max-width:720px){.site-global-header .brand-logo img{height:38px!important;width:143px!important}}
+
+
+/* Footer used on every page through templates/base.html. */
+.dol-site .site-global-footer{background:#fff!important;color:#475569;border-top:1px solid #ebdfe1}
+.dol-site .site-global-footer .dol-footer-grid{max-width:1280px;display:grid;grid-template-columns:minmax(200px,1.5fr) repeat(3,minmax(130px,1fr));align-items:start;gap:28px;padding:36px 26px 28px;font-size:.86rem}
+.dol-site .dol-footer-about strong{color:#bd2028;font-size:1.15rem;font-weight:800}
+.dol-site .dol-footer-about p{max-width:300px;margin:12px 0 0;line-height:1.75;color:#64748b}
+.dol-site .dol-footer-col{display:flex;flex-direction:column;align-items:flex-start;gap:11px;min-width:0}
+.dol-site .dol-footer-col h2{font-size:.89rem;font-weight:800;letter-spacing:.01em;color:#1e293b;margin:0 0 5px}
+.dol-site .dol-footer-col a{font-size:.82rem;line-height:1.4;color:#66748a;text-decoration:none;transition:color .15s ease}
+.dol-site .dol-footer-col a:hover{color:#c92127;text-decoration:underline;text-underline-offset:3px}
+.dol-site .dol-footer-bottom{display:flex;justify-content:space-between;gap:16px;max-width:1228px;padding:18px 0 24px;margin:0 auto;border-top:1px solid #f0e6e7;color:#8691a2;font-size:.75rem}
+@media(max-width:950px){.dol-site .site-global-footer .dol-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px}.dol-site .dol-footer-bottom{margin:0 26px}}
+@media(max-width:540px){.dol-site .site-global-footer .dol-footer-grid{grid-template-columns:1fr 1fr;gap:21px 14px;padding:28px 16px}.dol-site .dol-footer-about{grid-column:1/-1}.dol-site .dol-footer-bottom{flex-direction:column;margin:0 16px;gap:5px}}
